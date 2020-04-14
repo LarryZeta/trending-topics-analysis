@@ -1,6 +1,6 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-import re, csv, os
+import re, csv, os, datetime
 
 
 html = urlopen(
@@ -17,10 +17,12 @@ td_list = soup.find_all("td", {'class': 'td-02'}) # 热搜列表有效部分
 
 topic_list = []
 
+date = './data/' + datetime.date.today().strftime('%Y-%m-%d')
+os.mkdir(date)
 
 headers = ('Title', 'Link', 'Trending Count', 'Emotion')
 
-with open('./2020-04-13.csv', 'a') as csvFile:
+with open(date + 'csv', 'a', newline='') as csvFile:
     writer = csv.writer(csvFile)
     writer.writerow(headers)
     for td in td_list:
@@ -31,7 +33,4 @@ with open('./2020-04-13.csv', 'a') as csvFile:
         row = (td.a.string, td.a['href'], trending_count, emotion)
         writer.writerow(row)
 
-
-# html = open('./a.html').read()
-# soup = BeautifulSoup(html, features='lxml')
 

@@ -1,16 +1,35 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-import re, csv, os
+import re, csv, os, datetime
 
 
-# html = urlopen(
-#     "https://s.weibo.com/weibo?q=%23%E6%A2%B5%E9%AB%98%E6%98%9F%E7%A9%BA%E5%90%90%E5%8F%B8%23&Refer=top"
-# ).read().decode('utf-8')
-f = open('a.html', 'r')
-html = f.read()
 
-soup = BeautifulSoup(html, features='lxml')
-card_wraps = soup.findAll('div', {'class': 'card-wrap'})
 
-print(card_wraps[1].find('a', {'class': 'name'}).string) # 微博昵称
-print(card_wraps[1].find('p', {'class': 'txt'}).get_text()) # 微博正文
+def get_topic_contents(name, uri):
+    html = urlopen('https://s.weibo.com' + uri).read().decode('utf-8')
+
+    # f = open('a.html', 'w')
+    # print(html, file=f)
+
+    # f = open('a.html', 'r')
+    # html = f.read()
+
+    soup = BeautifulSoup(html, features='lxml')
+    feeds = soup('div', {'action-type': 'feed_list_item'})
+
+    file_name = './data/' + datetime.date.today().strftime('%Y-%m-%d')+ '/' + name + '.csv'
+    # file_name = './data/2020-04-13/' + name + '.csv'
+
+    headers = ('name', 'text')
+    with open(file_name, 'a', newline='') as csvFile:
+        writer = csv.writer(csvFile)
+        writer.writerow(headers)
+        for feed in feeds:
+            name = feed.find('a', {'class': 'name'}).string  # 微博昵称
+            text = feed.find('p', {'class': 'txt', 'node-type': "feed_list_content_full"}) # 微博正文
+            if text is not None: 
+                text = text.get_text().replace(' ','').replace('\n', '')
+            else: 
+                text = feed.find('p', {'class': 'txt', 'node-type': "feed_list_content"}).get_text().replace(' ','').replace('\n', '')
+            row = (name, text)
+            writer.writerow(row)
