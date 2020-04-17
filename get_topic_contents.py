@@ -2,10 +2,7 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import re, csv, os, datetime
 
-
-
-
-def get_topic_contents(name, uri):
+def get_topic_contents(name, uri, date):
     html = urlopen('https://s.weibo.com' + uri).read().decode('utf-8')
 
     # f = open('a.html', 'w')
@@ -17,8 +14,7 @@ def get_topic_contents(name, uri):
     soup = BeautifulSoup(html, features='lxml')
     feeds = soup('div', {'action-type': 'feed_list_item'})
 
-    file_name = './data/' + datetime.date.today().strftime('%Y-%m-%d')+ '/' + name + '.csv'
-    # file_name = './data/2020-04-13/' + name + '.csv'
+    file_name = './data/'+ date + '/' + name + '.csv'
 
     headers = ('name', 'text')
     with open(file_name, 'a', newline='') as csvFile:

@@ -7,25 +7,26 @@ html = urlopen(
     "https://s.weibo.com/top/summary?cate=realtimehot"
 ).read().decode('utf-8')
 
-# print(html,file= open('a.html', 'w'))
-# html = open('./a.html').read()
+# print(html,file= open('today.html', 'w'))
+# html = open('./today.html').read()
 
 soup = BeautifulSoup(html, features='lxml')
-td_list = soup.find_all("td", {'class': 'td-02'}) # 热搜列表有效部分
-
-# print(td_list.a)
+td_list = soup.find_all('td', {'class': 'td-02'}) # 热搜列表有效部分
 
 topic_list = []
 
-date = './data/' + datetime.date.today().strftime('%Y-%m-%d')
-os.mkdir(date)
+date = datetime.date.today().strftime('%Y-%m-%d')
+if not os.path.exists('./data/' + date):
+    os.mkdir('./data/' + date)
 
 headers = ('Title', 'Link', 'Trending Count', 'Emotion')
 
-with open(date + 'csv', 'a', newline='') as csvFile:
+with open('./data/' + date + '.csv', 'a', newline='') as csvFile:
     writer = csv.writer(csvFile)
     writer.writerow(headers)
     for td in td_list:
+        if td.a['href'] == 'javascript:void(0);':
+            continue
         if td.span: trending_count = td.span.string 
         else: trending_count = None
         if td.img: emotion = td.img['alt'] 
