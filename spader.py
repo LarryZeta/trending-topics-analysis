@@ -1,7 +1,7 @@
-import get_topic_contents, csv, random
+import get_topic_contents, csv, random, yaml
 from time import sleep
 
-days = ['2020-05-05']
+days = ['2020-05-07']
 
 for date in days:
     cookies = {}
