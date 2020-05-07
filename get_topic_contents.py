@@ -4,15 +4,9 @@ from time import sleep
 from tqdm import tqdm
 import re, csv, os, datetime, requests, random
 
-def get_topic_contents(topic_name, date):
+def get_topic_contents(topic_name, date, cookies):
     
     print(date + ': ' + topic_name)
-
-    cookie_str = 'UOR=bbs.aptx.cn,widget.weibo.com,login.sina.com.cn; SINAGLOBAL=7013905332748.457.1584003865013; ULV=1584003866020:1:1:1:7013905332748.457.1584003865013:; SCF=ApvXF8YzDLgwWPzUMd2sb_6uPp2HV_-L96IROT0H59hWaNQG9MyZ0dTkjkoCwrSYqjry_wRKLrzjenXOecQ2ELI.; SUHB=0P1Mp3pOeR_8Vm; ALF=1618826649; un=18810817370; wvr=6; _s_tentry=bbs.aptx.cn; Apache=7013905332748.457.1584003865013; login_sid_t=053dff415dda6dbc469f0df0de88c3fc; cross_origin_proto=SSL; SSOLoginState=1587055794; WBStorage=42212210b087ca50|undefined; SUB=_2A25zmFJJDeRhGeNK41oX8S3EzTuIHXVQ7MSBrDV8PUNbmtCOLWz1kW9NSVUNPhaygEB4b2MVCL0Z9DlK0fDbpl3i; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WFW-LvpH4oXIzuP4wUT1fvR5JpX5KMhUgL.Fo-X1hnceKeRSoM2dJLoI7LeqPiEwHDLUs2t'
-    cookies = {}
-    for line in cookie_str.split(';'):
-        key, value = line.strip().split('=', 1)
-        cookies[key] = value
     
     r = requests.get('https://s.weibo.com/weibo', {'q': topic_name}, cookies = cookies)
     html = r.content.decode('utf-8')
