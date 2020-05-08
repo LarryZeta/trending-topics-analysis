@@ -1,7 +1,7 @@
 import get_topic_contents, csv, random, yaml
 from time import sleep
 
-days = ['2020-05-07']
+days = ['2020-05-09']
 
 for date in days:
     cookies = {}
@@ -13,8 +13,8 @@ for date in days:
             key, value = line.strip().split('=', 1)
             cookies[key] = value
     
-    csvFile = open('./data/'+ date +'.csv', 'r')
-    reader = csv.reader(csvFile)
+    csv_file = open('./data/' + date + '.csv', 'r')
+    reader = csv.reader(csv_file)
     
     for item in reader:
         if reader.line_num == 1:
