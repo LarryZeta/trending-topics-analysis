@@ -1,4 +1,4 @@
-import get_topic_contents, csv, random, yaml
+import get_topic_contents, csv, random, yaml, datetime
 from time import sleep
 
 date = datetime.date.today().strftime('%Y-%m-%d')

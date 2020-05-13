@@ -3,9 +3,7 @@ from bs4 import BeautifulSoup
 import re, csv, os, datetime
 
 
-html = urlopen(
-    "https://s.weibo.com/top/summary?cate=realtimehot"
-).read().decode('utf-8')
+html = urlopen("https://s.weibo.com/top/summary?cate=realtimehot").read().decode('utf-8')
 
 # print(html,file= open('today.html', 'w'))
 # html = open('./today.html').read()
