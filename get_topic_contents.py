@@ -26,7 +26,7 @@ def get_topic_contents(topic_name, date, cookies):
     file_name = './data/'+ date + '/' + topic_name + '.csv'
     headers = ('user_name', 'text')
     page = 1
-    sleep_page = 1
+    sleep_page = 1 # 随机等待页 防止被封
     qbar = tqdm(total=pages_num)
     sleep(0.1) # 刷新显示
     qbar.update(1)

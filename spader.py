@@ -1,7 +1,9 @@
 import get_topic_contents, csv, random, yaml
 from time import sleep
 
-days = ['2020-05-09']
+date = datetime.date.today().strftime('%Y-%m-%d')
+# days = ['2020-04-20']
+days = [date]
 
 for date in days:
     cookies = {}

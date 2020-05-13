@@ -25,7 +25,7 @@ with open('./data/' + date + '.csv', 'a', newline='') as csvFile:
     writer = csv.writer(csvFile)
     writer.writerow(headers)
     for td in td_list:
-        if td.a['href'] == 'javascript:void(0);':
+        if td.a['href'] == 'javascript:void(0);': # 排除广告
             continue
         if td.span: trending_count = td.span.string 
         else: trending_count = None
