@@ -5,9 +5,6 @@ import re, csv, os, datetime
 
 html = urlopen("https://s.weibo.com/top/summary?cate=realtimehot").read().decode('utf-8')
 
-# print(html,file= open('today.html', 'w'))
-# html = open('./today.html').read()
-
 soup = BeautifulSoup(html, features='lxml')
 td_list = soup.find_all('td', {'class': 'td-02'}) # 热搜列表有效部分
 
@@ -17,7 +14,7 @@ date = datetime.date.today().strftime('%Y-%m-%d')
 if not os.path.exists('./data/' + date):
     os.mkdir('./data/' + date)
 
-headers = ('Title', 'Link', 'Trending Count', 'Emotion')
+headers = ('Title', 'Trending Count', 'Emotion')
 
 with open('./data/' + date + '.csv', 'a', newline='') as csvFile:
     writer = csv.writer(csvFile)
@@ -29,7 +26,5 @@ with open('./data/' + date + '.csv', 'a', newline='') as csvFile:
         else: trending_count = None
         if td.img: emotion = td.img['alt'] 
         else: emotion = None
-        row = (td.a.string, td.a['href'], trending_count, emotion)
+        row = (td.a.string, trending_count, emotion)
         writer.writerow(row)
-
-
