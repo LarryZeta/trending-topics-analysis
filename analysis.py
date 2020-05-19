@@ -1,9 +1,10 @@
-import yaml, json, csv, mysql.connector
+import yaml, json, csv
 import time
 import urllib.request
 import urllib.parse
 import hashlib
 import base64
+import sys
 from time import sleep
 
 
@@ -47,10 +48,13 @@ if __name__ == '__main__':
     with open('./config.yml', 'r') as config_file:
         config = yaml.load(config_file.read(), Loader=yaml.SafeLoader)
     
-    res_csv = open('./data/weibos_res.csv', 'a', newline='')
+    csv_file_name = './data/weibos_res_'+ sys.argv[1] + '_'+ sys.argv[2] +'.csv'
+    res_csv = open(csv_file_name, 'a', newline='')
     res_writer = csv.writer(res_csv)
-    length = 8752
-    index = 31248 - 2 # 第 index 条开始 数值为：行数 - 2
+    # length = 8752
+    # index = 31249 - 2 # 第 index 条开始 数值为：行数 - 2
+    length = int(sys.argv[2])
+    index = int(sys.argv[1]) - 2
     for i in range(index, index + length):
         weibo = weibos[i]
         res_json_str = get_emotion(
@@ -66,7 +70,7 @@ if __name__ == '__main__':
         else:
             sentiment_num = None
             sentiment_value = None
-            with open('./data/error', 'a', newline='') as error_file:
+            with open('./data/error', 'a') as error_file:
                 error_file.write('error:' + str(i))
         res = (weibo[0], weibo[1], weibo[2], res_json_str, sentiment_num, sentiment_value)
         res_writer.writerow(res)
