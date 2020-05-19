@@ -71,7 +71,6 @@ if __name__ == '__main__':
             sentiment_num = None
             sentiment_value = None
             with open('./data/error', 'a') as error_file:
-                error_file.write('error:' + str(i))
+                error_file.write('error:' + str(i) + '\n')
         res = (weibo[0], weibo[1], weibo[2], res_json_str, sentiment_num, sentiment_value)
         res_writer.writerow(res)
-        sleep(0.5)

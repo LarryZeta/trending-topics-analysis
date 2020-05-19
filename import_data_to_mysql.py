@@ -93,6 +93,27 @@ def get_all_weibos():
     return weibos
 
 
+def get_all_resaults(file_name):
+    
+    resaults = []
+    resault_csv = open('./data/' + file_name, 'r')
+    resault_reader = csv.reader(resault_csv)
+
+    for line in resault_reader:
+        # if resault_reader.line_num == 1:
+        #     continue
+        sentiment_num = line[4]
+        sentiment_value = line[5]
+        if sentiment_num == '':
+            sentiment_num = None
+        if sentiment_value == '':
+            sentiment_value = None
+        resault = (line[0], line[3], sentiment_num, sentiment_value)
+        resaults.append(resault)
+    
+    return resaults
+
+
 def insert_topics_to_mysql(topics):
 
     sql = 'INSERT INTO `topics` (date, topic_name, trending_count, emotion) VALUES (%s, %s, %s, %s)'
@@ -100,36 +121,45 @@ def insert_topics_to_mysql(topics):
     cursor.executemany(sql, topics)
     db.commit()
     print(cursor.rowcount, "topics was inserted.")
+    return cursor.rowcount
 
 
-def insert_weibos_to_mysql(weibos):
+# def insert_weibos_to_mysql(weibos):
 
-    sql = 'INSERT INTO `weibo` (topic_num, weibo_user, weibo_content) VALUES (%s, %s, %s)'
+#     sql = 'INSERT INTO `weibo` (topic_num, weibo_user, weibo_content) VALUES (%s, %s, %s)'
+#     cursor = db.cursor()
+#     cursor.executemany(sql, weibos)
+#     db.commit()
+#     print(cursor.rowcount, "weibos was inserted.")
+#     return cursor.rowcount
+
+
+def insert_resaults_to_mysql(resaults):
+
+    sql = 'INSERT INTO `trending-db`.`resaults` (`topic_num`, `resault_json`, `sentiment_num`, `sentiment_value`) VALUES (%s, %s, %s, %s);'
     cursor = db.cursor()
-    cursor.executemany(sql, weibos)
+    cursor.executemany(sql, resaults)
     db.commit()
-    print(cursor.rowcount, "weibos was inserted.")
+    print(cursor.rowcount, "resaults was inserted.")
     return cursor.rowcount
 
 
 def main():
     # days = get_days_between('2020-04-07', '2020-05-15')
-    weibos = get_all_weibos()
+    resaults = get_all_resaults('weibos_res_1_40000.csv')
     count = 0
     # weibo_csv = open('./data/weibos.csv', 'a')
     # weibo_writer = csv.writer(weibo_csv)
     # weibo_writer.writerows(weibos)
-    for i in range(1200, 1119975, 100):
-        # count = count + insert_weibos_to_mysql(weibos[i : i + 1000])
-        j = i + 100
-        insert_weibos_to_mysql(weibos[i : j])
-        print(weibos[i : j])
+    for i in range(0, 40000, 1000):
+        j = i + 1000
+        count = count + insert_resaults_to_mysql(resaults[i : j])
         sleep(3)
-    print(count, 'weibos was totally inserted.')
+    print(count, 'resaults was totally inserted.')
 
 def test():
-    for i in range(0, 1119975, 1000):
-        print(i, i + 1000)
+    resaults = get_all_resaults('test.csv')
+    insert_resaults_to_mysql(resaults)
     
     
 
