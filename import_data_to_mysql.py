@@ -1,5 +1,6 @@
-import datetime, csv
+import datetime, csv, emoji
 import mysql.connector
+from time import sleep
 
 
 db = mysql.connector.connect(
@@ -10,37 +11,127 @@ db = mysql.connector.connect(
   port='23306'
 )
 
-sql = 'INSERT INTO topics (date, topic_name, trending_count, emotion) VALUES (%s, %s, %s, %s)'
-cursor = db.cursor()
-vals = []
-# val = ('2020-04-24', '中国航天日', None, None)
-# cursor.execute(sql, val)
-# db.commit()
+def get_days_between(start_str, end_str):
+    def parse_ymd(date_str):
+        year_str, mon_str, day_str = date_str.split('-')
+        return datetime.datetime(int(year_str), int(mon_str), int(day_str))
+    
+    # start = datetime.datetime(2020, 4, 7)
+    start_date = parse_ymd(start_str)
+    # end = datetime.datetime(2020, 5, 15)
+    end_date = parse_ymd(end_str)
 
-# start = datetime.datetime(2020, 4, 7)
-# end = datetime.datetime(2020, 5, 13)
+    delta = end_date - start_date
 
-# delta = end - start
+    days = []
+    for i in range(delta.days + 1):
+        days.append(str((start_date + datetime.timedelta(days=i)).strftime('%Y-%m-%d')))
+    
+    return days
 
-days = ['2020-05-15']
-# for i in range(delta.days + 1):
-#     days.append(str((start + datetime.timedelta(days=i)).strftime('%Y-%m-%d')))
 
-for date in days:
-    date_csv = open('./data/'+ date +'.csv', 'r')
-    date_reader = csv.reader(date_csv)
-    for line in date_reader:
-        if date_reader.line_num == 1:
+def get_all_topics(days):
+    
+    topics = []
+    
+    for date in days:
+        date_csv = open('./data/'+ date +'.csv', 'r')
+        date_reader = csv.reader(date_csv)
+        
+        for line in date_reader:
+            if date_reader.line_num == 1:
+                continue
+            topic_name = line[0]
+            trending_count = line[1]
+            if trending_count == '': trending_count = None
+            emotion = line[2]
+            if emotion == '': emotion = None
+            topic = (date, topic_name, trending_count, emotion)
+            topics.append(topic)
+    
+    return topics
+
+
+# def get_all_weibos(days):
+
+#     weibos = []
+#     topic_num = 0
+
+#     for date in days:
+#         date_csv = open('./data/'+ date +'.csv', 'r')
+#         date_reader = csv.reader(date_csv)
+#         for line in date_reader:
+#             if date_reader.line_num == 1:
+#                 continue
+#             topic_name = line[0]
+#             topic_num = topic_num + 1
+#             topic_file_csv = open('./data/'+ date + '/' + topic_name + '.csv', 'r')
+#             topic_file_reader = csv.reader(topic_file_csv)
+#             for weibo in topic_file_reader:
+#                 if topic_file_reader.line_num == 1:
+#                     continue
+#                 weibo_user = weibo[0]
+#                 weibo_content = emoji.demojize(weibo[1])
+#                 weibo = (topic_num, weibo_user, weibo_content)
+#                 weibos.append(weibo)
+
+#     return weibos
+
+
+def get_all_weibos():
+    
+    weibos = []
+    weibo_csv = open('./data/weibos.csv', 'r')
+    weibo_reader = csv.reader(weibo_csv)
+    
+    for line in weibo_reader:
+        if weibo_reader.line_num == 1:
             continue
-        topic_name = line[0]
-        trending_count = line[1]
-        if trending_count == '': trending_count = None
-        emotion = line[2]
-        if emotion == '': emotion = None
-        val = (date, topic_name, trending_count, emotion)
-        vals.append(val)
+        weibo = (line[0], line[1], line[2])
+        weibos.append(weibo)
+    
+    return weibos
 
-cursor.executemany(sql, vals)
-db.commit()
-print(cursor.rowcount, "was inserted.")
 
+def insert_topics_to_mysql(topics):
+
+    sql = 'INSERT INTO `topics` (date, topic_name, trending_count, emotion) VALUES (%s, %s, %s, %s)'
+    cursor = db.cursor()
+    cursor.executemany(sql, topics)
+    db.commit()
+    print(cursor.rowcount, "topics was inserted.")
+
+
+def insert_weibos_to_mysql(weibos):
+
+    sql = 'INSERT INTO `weibo` (topic_num, weibo_user, weibo_content) VALUES (%s, %s, %s)'
+    cursor = db.cursor()
+    cursor.executemany(sql, weibos)
+    db.commit()
+    print(cursor.rowcount, "weibos was inserted.")
+    return cursor.rowcount
+
+
+def main():
+    # days = get_days_between('2020-04-07', '2020-05-15')
+    weibos = get_all_weibos()
+    count = 0
+    # weibo_csv = open('./data/weibos.csv', 'a')
+    # weibo_writer = csv.writer(weibo_csv)
+    # weibo_writer.writerows(weibos)
+    for i in range(1200, 1119975, 100):
+        # count = count + insert_weibos_to_mysql(weibos[i : i + 1000])
+        j = i + 100
+        insert_weibos_to_mysql(weibos[i : j])
+        print(weibos[i : j])
+        sleep(3)
+    print(count, 'weibos was totally inserted.')
+
+def test():
+    for i in range(0, 1119975, 1000):
+        print(i, i + 1000)
+    
+    
+
+if __name__ == '__main__':
+    main()
