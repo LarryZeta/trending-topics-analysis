@@ -11,12 +11,10 @@ from time import sleep
 def get_all_weibos():
     
     weibos = []
-    weibo_csv = open('./data/weibos.csv', 'r')
+    weibo_csv = open('./test.csv', 'r')
     weibo_reader = csv.reader(weibo_csv)
     
     for line in weibo_reader:
-        if weibo_reader.line_num == 1:
-            continue
         weibo = (line[0], line[1], line[2])
         weibos.append(weibo)
     
@@ -48,15 +46,12 @@ if __name__ == '__main__':
     with open('./config.yml', 'r') as config_file:
         config = yaml.load(config_file.read(), Loader=yaml.SafeLoader)
     
-    csv_file_name = './data/weibos_res_'+ sys.argv[1] + '_'+ sys.argv[2] +'.csv'
+    csv_file_name = './out.csv'
     res_csv = open(csv_file_name, 'a', newline='')
     res_writer = csv.writer(res_csv)
     # length = 8752
     # index = 31249 - 2 # 第 index 条开始 数值为：行数 - 2
-    length = int(sys.argv[2])
-    index = int(sys.argv[1]) - 2
-    for i in range(index, index + length):
-        weibo = weibos[i]
+    for weibo in weibos:
         res_json_str = get_emotion(
             weibo[2][:160],
             config['xf_appid'], 
@@ -71,7 +66,6 @@ if __name__ == '__main__':
             sentiment_num = None
             sentiment_value = None
             sleep(60)
-            with open('./data/error', 'a') as error_file:
-                error_file.write('error:' + str(i) + '\n')
         res = (weibo[0], weibo[1], weibo[2], res_json_str, sentiment_num, sentiment_value)
         res_writer.writerow(res)
+        sleep(1)

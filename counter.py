@@ -1,18 +1,6 @@
 import datetime, csv
 import mysql.connector
 
-start = datetime.datetime(2020, 4, 7)
-end = datetime.datetime(2020, 5, 15)
-
-delta = end - start
-
-days = []
-for i in range(delta.days + 1):
-    days.append(str((start + datetime.timedelta(days=i)).strftime('%Y-%m-%d')))
-
-topic_num = 0
-weibo_num = 0
-
 db = mysql.connector.connect(
   host='nas',
   user='root',
@@ -21,24 +9,30 @@ db = mysql.connector.connect(
   port='23306'
 )
 
-sql = "UPDATE `trending-db`.`topics` SET `weibo_num`=%s WHERE `topic_name`=%s "
+sql = "SELECT * FROM `trending-db`.`topics`"
 cursor = db.cursor()
 
-for date in days:
-    date_csv = open('./data/'+ date +'.csv', 'r')
-    date_reader = csv.reader(date_csv)
-    for line in date_reader:
-        if date_reader.line_num == 1:
-            continue
-        topic_name = line[0]
-        topic_num = topic_num + 1
-        new_topic_num = len(open('./data/'+ date + '/' + topic_name + '.csv', 'r').readlines()) - 1
-        weibo_num = weibo_num + new_topic_num
-        # val = (new_topic_num, topic_name)
-        # cursor.execute(sql, val)
-
+cursor.execute(sql)
 # db.commit()
-# print(cursor.rowcount, "record updated.")
+resaults = cursor.fetchall()
 
+topics = []
+for r in resaults:
+    # print(r)
+    topic_num = r[0]
+    date = r[1].strftime('%Y-%m-%d')
+    topic_name = r[2].decode('utf8')
+    trending_count = r[3]
+    weibo_num = r[4]
+    emotion = None
+    if r[5]:
+        emotion = r[5].decode('utf8')
+    tag_num = r[6]
+    ncov = r[7]
+    topic = (topic_num, date, topic_name, trending_count, weibo_num, emotion, tag_num,ncov)
+    topics.append(topic)
 
-print('共：', topic_num , '条热搜，', weibo_num , '条微博')
+# print(topics)
+# with open('./data/topics.csv', 'a') as topic_csv:
+#     topic_writer = csv.writer(topic_csv)
+#     topic_writer.writerows(topics)

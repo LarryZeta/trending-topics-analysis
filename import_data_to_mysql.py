@@ -35,7 +35,7 @@ def get_all_topics(days):
     topics = []
     
     for date in days:
-        date_csv = open('./data/'+ date +'.csv', 'r')
+        date_csv = open('./data/spader_row_data/'+ date +'.csv', 'r')
         date_reader = csv.reader(date_csv)
         
         for line in date_reader:
@@ -58,7 +58,7 @@ def get_all_topics(days):
 #     topic_num = 0
 
 #     for date in days:
-#         date_csv = open('./data/'+ date +'.csv', 'r')
+#         date_csv = open('./data/spader_row_data/'+ date +'.csv', 'r')
 #         date_reader = csv.reader(date_csv)
 #         for line in date_reader:
 #             if date_reader.line_num == 1:
@@ -96,7 +96,7 @@ def get_all_weibos():
 def get_all_resaults(file_name):
     
     resaults = []
-    resault_csv = open('./data/' + file_name, 'r')
+    resault_csv = open('./data/resault_data/' + file_name, 'r')
     resault_reader = csv.reader(resault_csv)
 
     for line in resault_reader:
@@ -146,12 +146,13 @@ def insert_resaults_to_mysql(resaults):
 
 def main():
     # days = get_days_between('2020-04-07', '2020-05-15')
-    resaults = get_all_resaults('weibos_res_1_40000.csv')
+    # resaults = get_all_resaults('weibos_res_1_40000.csv')
+    resaults = get_all_resaults('weibos_res_140001_20000.csv')
     count = 0
     # weibo_csv = open('./data/weibos.csv', 'a')
     # weibo_writer = csv.writer(weibo_csv)
     # weibo_writer.writerows(weibos)
-    for i in range(0, 40000, 1000):
+    for i in range(0, 20000, 1000):
         j = i + 1000
         count = count + insert_resaults_to_mysql(resaults[i : j])
         sleep(3)
